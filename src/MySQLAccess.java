@@ -6,6 +6,8 @@
 
 package com.adarwin.pcbc;
 
+import com.adarwin.logging.Logbook;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -13,7 +15,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import com.adarwin.logging.Logbook;
 
 public class MySQLAccess
 {
@@ -25,6 +26,9 @@ public class MySQLAccess
   private String dbName = "PantonChurch";
   private String username = "MemberManager";
   private String password = "pcbc";
+  private boolean properlySetup = false;
+  private String badSetupString = "Did not execute query because " +
+                                  "database was not set up correctly.";
 
   public MySQLAccess(String dbName, String username, String password)
   {
@@ -49,14 +53,15 @@ public class MySQLAccess
       String url = "jdbc:mysql://localhost/" + dbName;
       connection = DriverManager.getConnection(url, username, password);
       statement = connection.createStatement();
+      properlySetup = true;
     }
     catch (ClassNotFoundException ex)
     {
-      ex.printStackTrace();
+      logbook.log(ex);
     }
     catch (SQLException ex)
     {
-      ex.printStackTrace();
+      logbook.log(ex);
     }
   }
   public ArrayList<String> getFamiliesList()
@@ -64,13 +69,20 @@ public class MySQLAccess
     ArrayList<String> output = new ArrayList<String>();
     try
     {
-      resultSet = statement.executeQuery("select FName " +
-                                         "from families " +
-                                         "order by FName asc;");
-      while(resultSet.next())
+      if (properlySetup)
       {
-        String name = resultSet.getString("FName");
-        output.add(name);
+        resultSet = statement.executeQuery("select FName " +
+                                           "from families " +
+                                           "order by FName asc;");
+        while(resultSet.next())
+        {
+          String name = resultSet.getString("FName");
+          output.add(name);
+        }
+      }
+      else
+      {
+        logbook.log(Logbook.WARNING, badSetupString);
       }
     }
     catch (SQLException ex)
@@ -86,14 +98,21 @@ public class MySQLAccess
     ArrayList<String> output = new ArrayList<String>();
     try
     {
-      resultSet = statement.executeQuery("select MemFirstName, MemLastName " +
-                                         "from members " +
-                                         "order by MemLastName asc, MemFirstName asc;");
-      while(resultSet.next())
+      if (properlySetup)
       {
-        String firstName = resultSet.getString("MemFirstName");
-        String lastName = resultSet.getString("MemLastName");
-        output.add(lastName + ", " + firstName);
+        resultSet = statement.executeQuery("select MemFirstName, MemLastName " +
+                                           "from members " +
+                                           "order by MemLastName asc, MemFirstName asc;");
+        while(resultSet.next())
+        {
+          String firstName = resultSet.getString("MemFirstName");
+          String lastName = resultSet.getString("MemLastName");
+          output.add(lastName + ", " + firstName);
+        }
+      }
+      else
+      {
+        logbook.log(Logbook.WARNING, badSetupString);
       }
     }
     catch (SQLException ex)
@@ -110,13 +129,20 @@ public class MySQLAccess
   {
     try
     {
-      resultSet = statement.executeQuery("select memID " +
-                                         "from members " +
-                                         "where memFirstName like '" + firstName + "' " +
-                                         "and memLastName like '" + lastName + "';");
-      if (resultSet.next())
+      if (properlySetup)
       {
-        System.out.println(resultSet.getString("memID"));
+        resultSet = statement.executeQuery("select memID " +
+                                           "from members " +
+                                           "where memFirstName like '" + firstName + "' " +
+                                           "and memLastName like '" + lastName + "';");
+        if (resultSet.next())
+        {
+          System.out.println(resultSet.getString("memID"));
+        }
+      }
+      else
+      {
+        logbook.log(Logbook.WARNING, badSetupString);
       }
     }
     catch (SQLException ex)

@@ -34,6 +34,9 @@ import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -114,7 +117,7 @@ public class ChurchMemberManager
 
     searchBox = new JTextField("Search");
     searchBox.setForeground(Color.gray);
-    searchBox.setPreferredSize(new Dimension(150, 30));
+    searchBox.setPreferredSize(new Dimension(150, 20));
 
     memberJList = new JList<String>(memberListModel);
 
@@ -125,19 +128,19 @@ public class ChurchMemberManager
   {
     final JFrame startFrame = new JFrame("Welcome");
     startFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    startFrame.setMinimumSize(new Dimension(440, 140));
+    startFrame.setMinimumSize(new Dimension(370, 160));
     JLabel dbNameLabel = new JLabel("Database Name:");
     JLabel userLabel = new JLabel("Username:");
     JLabel passwordLabel = new JLabel("Password:");
     dbNameLabel.setHorizontalAlignment(SwingConstants.LEFT);
     userLabel.setHorizontalAlignment(SwingConstants.RIGHT);
     passwordLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-    final JTextField dbNameField = new JTextField();
-    dbNameField.setPreferredSize(new Dimension(100, 30));
-    final JTextField userField = new JTextField();
-    userField.setPreferredSize(new Dimension(100, 30));
+    final JTextField dbNameField = new JTextField("PantonChurch");
+    //dbNameField.setPreferredSize(new Dimension(100, 30));
+    final JTextField userField = new JTextField("andrew");
+    //userField.setPreferredSize(new Dimension(100, 30));
     final JPasswordField passwordField = new JPasswordField();
-    passwordField.setPreferredSize(new Dimension(100, 30));
+    //passwordField.setPreferredSize(new Dimension(100, 30));
     JButton connectButton = new JButton("Connect");
     JButton cancelButton = new JButton("Cancel");
     JCheckBox alwaysCheckBox = new JCheckBox("Always use these login credentials");
@@ -157,47 +160,49 @@ public class ChurchMemberManager
     {
       public void actionPerformed(ActionEvent e)
       {
-        startFrame.dispose();
+        //startFrame.dispose();
+        System.exit(0);
       }
     });
 
     Container contentPane = startFrame.getContentPane();
 
+    int m = 5; //m = margin
     SpringLayout layout = new SpringLayout();
-    layout.putConstraint(SpringLayout.NORTH, dbNameLabel, 0, SpringLayout.NORTH, contentPane);
+    layout.putConstraint(SpringLayout.NORTH, dbNameLabel, 2*m, SpringLayout.NORTH, contentPane);
     layout.putConstraint(SpringLayout.SOUTH, dbNameLabel, 0, SpringLayout.SOUTH, dbNameField);
-    layout.putConstraint(SpringLayout.WEST, dbNameLabel, 0, SpringLayout.WEST, contentPane);
+    layout.putConstraint(SpringLayout.WEST, dbNameLabel, m, SpringLayout.WEST, contentPane);
 
-    layout.putConstraint(SpringLayout.NORTH, dbNameField, 0, SpringLayout.NORTH, contentPane);
-    layout.putConstraint(SpringLayout.EAST, dbNameField, 0, SpringLayout.EAST, contentPane);
-    layout.putConstraint(SpringLayout.WEST, dbNameField, 0, SpringLayout.EAST, dbNameLabel);
+    layout.putConstraint(SpringLayout.NORTH, dbNameField, 2*m, SpringLayout.NORTH, contentPane);
+    layout.putConstraint(SpringLayout.EAST, dbNameField, -1*m, SpringLayout.EAST, contentPane);
+    layout.putConstraint(SpringLayout.WEST, dbNameField, m, SpringLayout.EAST, dbNameLabel);
 
-    layout.putConstraint(SpringLayout.NORTH, userLabel, 0, SpringLayout.SOUTH, dbNameLabel);
+    layout.putConstraint(SpringLayout.NORTH, userLabel, 2*m, SpringLayout.SOUTH, dbNameLabel);
     layout.putConstraint(SpringLayout.SOUTH, userLabel, 0, SpringLayout.SOUTH, userField);
     layout.putConstraint(SpringLayout.EAST, userLabel, 0, SpringLayout.EAST, dbNameLabel);
-    layout.putConstraint(SpringLayout.WEST, userLabel, 0, SpringLayout.WEST, contentPane);
+    layout.putConstraint(SpringLayout.WEST, userLabel, m, SpringLayout.WEST, contentPane);
 
-    layout.putConstraint(SpringLayout.NORTH, userField, 0, SpringLayout.SOUTH, dbNameField);
-    layout.putConstraint(SpringLayout.EAST, userField, 0, SpringLayout.EAST, contentPane);
-    layout.putConstraint(SpringLayout.WEST, userField, 0, SpringLayout.EAST, userLabel);
+    layout.putConstraint(SpringLayout.NORTH, userField, 2*m, SpringLayout.SOUTH, dbNameField);
+    layout.putConstraint(SpringLayout.EAST, userField, -1*m, SpringLayout.EAST, contentPane);
+    layout.putConstraint(SpringLayout.WEST, userField, m, SpringLayout.EAST, userLabel);
 
-    layout.putConstraint(SpringLayout.NORTH, passwordLabel, 0, SpringLayout.SOUTH, userLabel);
+    layout.putConstraint(SpringLayout.NORTH, passwordLabel, 2*m, SpringLayout.SOUTH, userLabel);
     layout.putConstraint(SpringLayout.SOUTH, passwordLabel, 0, SpringLayout.SOUTH, passwordField);
     layout.putConstraint(SpringLayout.EAST, passwordLabel, 0, SpringLayout.EAST, userLabel);
-    layout.putConstraint(SpringLayout.WEST, passwordLabel, 0, SpringLayout.WEST, contentPane);
+    layout.putConstraint(SpringLayout.WEST, passwordLabel, m, SpringLayout.WEST, contentPane);
 
-    layout.putConstraint(SpringLayout.NORTH, passwordField, 0, SpringLayout.SOUTH, userField);
-    layout.putConstraint(SpringLayout.EAST, passwordField, 0, SpringLayout.EAST, contentPane);
-    layout.putConstraint(SpringLayout.WEST, passwordField, 0, SpringLayout.EAST, passwordLabel);
+    layout.putConstraint(SpringLayout.NORTH, passwordField, 2*m, SpringLayout.SOUTH, userField);
+    layout.putConstraint(SpringLayout.EAST, passwordField, -1*m, SpringLayout.EAST, contentPane);
+    layout.putConstraint(SpringLayout.WEST, passwordField, m, SpringLayout.EAST, passwordLabel);
 
-    layout.putConstraint(SpringLayout.SOUTH, cancelButton, 0, SpringLayout.SOUTH, contentPane);
-    layout.putConstraint(SpringLayout.EAST, cancelButton, 0, SpringLayout.EAST, contentPane);
+    layout.putConstraint(SpringLayout.SOUTH, cancelButton, -1*m, SpringLayout.SOUTH, contentPane);
+    layout.putConstraint(SpringLayout.EAST, cancelButton, -1*m, SpringLayout.EAST, contentPane);
 
-    layout.putConstraint(SpringLayout.SOUTH, connectButton, 0, SpringLayout.SOUTH, contentPane);
-    layout.putConstraint(SpringLayout.EAST, connectButton, 0, SpringLayout.WEST, cancelButton);
+    layout.putConstraint(SpringLayout.SOUTH, connectButton, -1*m, SpringLayout.SOUTH, contentPane);
+    layout.putConstraint(SpringLayout.EAST, connectButton, -1*m, SpringLayout.WEST, cancelButton);
 
-    layout.putConstraint(SpringLayout.SOUTH, alwaysCheckBox, 0, SpringLayout.SOUTH, contentPane);
-    layout.putConstraint(SpringLayout.WEST, alwaysCheckBox, 0, SpringLayout.WEST, contentPane);
+    layout.putConstraint(SpringLayout.SOUTH, alwaysCheckBox, -1*m, SpringLayout.SOUTH, contentPane);
+    layout.putConstraint(SpringLayout.WEST, alwaysCheckBox, m, SpringLayout.WEST, contentPane);
 
     contentPane.setLayout(layout);
     contentPane.add(dbNameLabel);
@@ -212,6 +217,7 @@ public class ChurchMemberManager
 
     startFrame.setLocationRelativeTo(null);
     startFrame.setVisible(true);
+    startFrame.pack();
   }
 
   private static void initializePeripherals()
@@ -226,7 +232,8 @@ public class ChurchMemberManager
     {
       public void actionPerformed(ActionEvent e)
       {
-        mainFrame.dispose();
+        //mainFrame.dispose();
+        System.exit(0);
       }
     });
     searchBox.addFocusListener(new FocusListener()
@@ -249,7 +256,7 @@ public class ChurchMemberManager
         String selection = memberJList.getSelectedValue();
         String key = ", ";
         String firstName = selection.substring(0, selection.indexOf(key));
-        String lastName = selection.substring(selection.indexOf(key) + key.length);
+        String lastName = selection.substring(selection.indexOf(key) + key.length());
         Member selectedMember = dbAccess.getMember(lastName, firstName);
       }
     });
@@ -257,8 +264,9 @@ public class ChurchMemberManager
 
   private static void configureLayouts()
   {
-    headerLayout.putConstraint(SpringLayout.NORTH, searchBox,  0, SpringLayout.NORTH, header);
-    headerLayout.putConstraint(SpringLayout.EAST, searchBox,  0, SpringLayout.EAST, header);
+    int m = 5; //m = margin
+    headerLayout.putConstraint(SpringLayout.NORTH, searchBox,  m, SpringLayout.NORTH, header);
+    headerLayout.putConstraint(SpringLayout.EAST, searchBox,  -1*m, SpringLayout.EAST, header);
   }
 
   private static void assembleGUI()
@@ -309,6 +317,22 @@ public class ChurchMemberManager
   }
   public static void main(String[] args)
   {
+    try
+    {
+      UIManager.setLookAndFeel("com.jtattoo.plaf.acryl.AcrylLookAndFeel");
+    }
+    catch (UnsupportedLookAndFeelException ex)
+    {
+    }
+    catch (ClassNotFoundException ex)
+    {
+    }
+    catch (InstantiationException ex)
+    {
+    }
+    catch (IllegalAccessException ex)
+    {
+    }
     SwingUtilities.invokeLater(new Runnable()
     {
       public void run()
