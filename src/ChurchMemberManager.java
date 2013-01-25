@@ -61,7 +61,7 @@ public class ChurchMemberManager
   private static MemberCard memberCard;
   private static FamilyCard familyCard;
 
-  private static MySQLAccess dbAccess;
+  protected static MySQLAccess dbAccess;
 
   private static ConnectionInfo connectionInfo;
 
@@ -339,7 +339,7 @@ public class ChurchMemberManager
     {
       public void valueChanged(ListSelectionEvent e)
       {
-        if (!e.getValueIsAdjusting())
+        if (!e.getValueIsAdjusting() && memberJList.getSelectedValue() != null)
         {
           String selection = memberJList.getSelectedValue();
           String key = ", ";
@@ -415,15 +415,25 @@ public class ChurchMemberManager
                                connectionInfo.getUsername(),
                                connectionInfo.getPassword());
     dbAccess.loadDatabase();
+    reloadMemberList();
+    reloadFamilyList();
+  }
+
+  protected static void reloadMemberList()
+  {
+    memberListModel.clear();
     ArrayList<String> members = dbAccess.getMembersList();
     for (String member : members)
     {
       memberListModel.addElement(member);
     }
+  }
+  protected static void reloadFamilyList()
+  {
+    familyListModel.clear();
     ArrayList<String> families = dbAccess.getFamiliesList();
     for (String family : families)
     {
-      System.out.println(family);
       familyListModel.addElement(family);
     }
   }

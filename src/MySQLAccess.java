@@ -165,6 +165,52 @@ public class MySQLAccess
 
 
 
+
+  private String getStringForDBUpdate(String inputValue)
+  {
+    if (inputValue == null || inputValue.equalsIgnoreCase("null"))
+    {
+      return "NULL";
+    }
+    else
+    {
+      return inputValue;
+    }
+  }
+  public void updateMember(Member member)
+  {
+    try
+    {
+      if (properlySetup)
+      {
+        String firstName = getStringForDBUpdate(member.getFirstName());
+        String middleName = getStringForDBUpdate(member.getMiddleName());
+        String lastName = getStringForDBUpdate(member.getLastName());
+        String dob = getStringForDBUpdate(member.getDateOfBirthString());
+        String cellPhone = getStringForDBUpdate(member.getCellPhone());
+        String email = getStringForDBUpdate(member.getEmail());
+        String blurb = getStringForDBUpdate(member.getBlurb());
+        int id = member.getID();
+        int rows = statement.executeUpdate("UPDATE members SET " +
+                                           "MemFirstName = '" + firstName + "', " +
+                                           "MemMIName = '" + middleName + "', " +
+                                           "MemLastName = '" + lastName + "', " +
+                                           "MemDOB = '" + dob + "', " +
+                                           "CellPhone = '" + cellPhone + "', " +
+                                           "Email = '" + email + "', " +
+                                           "MemBlurb = '" + blurb + "' " +
+                                           "WHERE memID = " + id + " limit 1;");
+        logbook.log(Logbook.INFO, "Updated " + rows + " rows");
+      }
+    }
+    catch (SQLException ex)
+    {
+      logbook.log(ex);
+    }
+  }
+
+
+
   public void addNewUser(String username, String password)
   {
   }

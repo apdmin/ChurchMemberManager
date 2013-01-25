@@ -33,10 +33,10 @@ public class Card extends JPanel
   {
     address1Label = new JLabel("Address Line 1:");
     address2Label = new JLabel("Address Line 2:");
-    address1Field = new EditableJLabel("801 Middlebrook Rd");
-    address2Field = new EditableJLabel("Ferrisburg, VT 05456");
+    address1Field = new EditableJLabel("ADDRESS LINE 1");
+    address2Field = new EditableJLabel("ADDRESS LINE 2");
     applyChangesButton = new JButton("Apply Changes");
-    applyChangesButton.setEnabled(false);
+    //applyChangesButton.setEnabled(false);
     imagePanel = new ImagePanel();
     layout = new SpringLayout();
     setLayout(layout);

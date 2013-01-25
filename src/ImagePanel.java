@@ -15,6 +15,6 @@ public class ImagePanel extends JPanel
   public ImagePanel()
   {
     setBorder(BorderFactory.createEtchedBorder());
-    setPreferredSize(new Dimension(200, 200));
+    setPreferredSize(new Dimension(125, 125));
   }
 }

@@ -102,11 +102,16 @@ public class EditableJLabel extends JPanel
   {
     originalText = text;
     setText(text);
+    labelVersion.setForeground(Color.black);
   }
   public void setText(String text)
   {
     labelVersion.setText(text);
     textFieldVersion.setText(text);
+  }
+  public String getText()
+  {
+    return labelVersion.getText();
   }
 
   public void enterEditMode()

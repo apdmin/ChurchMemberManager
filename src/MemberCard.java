@@ -6,6 +6,8 @@
 
 package com.adarwin.pcbc;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SpringLayout;
@@ -13,8 +15,8 @@ import javax.swing.SpringLayout;
 public class MemberCard extends Card
 {
   private Member member;
-  private JLabel firstNameLabel, lastNameLabel, dateOfBirthLabel;
-  private EditableJLabel firstNameField, lastNameField, dateOfBirthField;
+  private JLabel firstNameLabel, lastNameLabel, dateOfBirthLabel, emailLabel;
+  private EditableJLabel firstNameField, lastNameField, dateOfBirthField, emailField;
 
   public MemberCard()
   {
@@ -33,20 +35,11 @@ public class MemberCard extends Card
     member = newMember;
     firstNameField.setInitialText(member.getFirstName());
     lastNameField.setInitialText(member.getLastName());
-    String dob;
-    if (member.getDateOfBirth() != null)
-    {
-      dob = member.getDateOfBirth().toString();
-    }
-    else
-    {
-      dob = "";
-    }
-    dateOfBirthField.setInitialText(dob);
-    //dateOfBirthField.setInitialText(member.getDateOfBirth().toString());
+    dateOfBirthField.setInitialText(member.getDateOfBirthString());
+    emailField.setInitialText(member.getEmail());
     address1Field.setInitialText(member.getAddressLine1());
     address2Field.setInitialText(member.getAddressLine2());
-    repaint();
+    //repaint();
   }
 
 
@@ -59,14 +52,29 @@ public class MemberCard extends Card
     firstNameLabel = new JLabel("First Name:");
     lastNameLabel = new JLabel("Last Name:");
     dateOfBirthLabel = new JLabel("Date Of Birth:");
-    firstNameField = new EditableJLabel("Andrew");
-    lastNameField = new EditableJLabel("Darwin");
-    dateOfBirthField = new EditableJLabel("1800-01-01");
+    emailLabel = new JLabel("Email:");
+    firstNameField = new EditableJLabel("FIRST NAME HERE");
+    lastNameField = new EditableJLabel("LAST NAME HERE");
+    dateOfBirthField = new EditableJLabel("DOB HERE");
+    emailField = new EditableJLabel("EMAIL ADDRESS HERE");
+    applyChangesButton.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        member.setFirstName(firstNameField.getText());
+        member.setLastName(lastNameField.getText());
+        member.setDateOfBirthString(dateOfBirthField.getText());
+        member.setEmail(emailField.getText());
+        ChurchMemberManager.dbAccess.updateMember(member);
+        ChurchMemberManager.reloadMemberList();
+      }
+    });
     if (member != null)
     {
       firstNameField.setText(member.getFirstName());
       lastNameField.setText(member.getLastName());
       dateOfBirthField.setText(member.getDateOfBirth().toString());
+      emailField.setText(member.getEmail());
     }
   }
   @Override
@@ -76,9 +84,11 @@ public class MemberCard extends Card
     componentList.add(firstNameLabel);
     componentList.add(lastNameLabel);
     componentList.add(dateOfBirthLabel);
+    componentList.add(emailLabel);
     componentList.add(firstNameField);
     componentList.add(lastNameField);
     componentList.add(dateOfBirthField);
+    componentList.add(emailField);
   }
 
 
@@ -109,7 +119,14 @@ public class MemberCard extends Card
     layout.putConstraint(SpringLayout.SOUTH, dateOfBirthField, 0, SpringLayout.SOUTH, dateOfBirthLabel);
     layout.putConstraint(SpringLayout.WEST, dateOfBirthField, m, SpringLayout.EAST, dateOfBirthLabel);
 
-    layout.putConstraint(SpringLayout.NORTH, address1Label, m, SpringLayout.SOUTH, dateOfBirthLabel);
+    layout.putConstraint(SpringLayout.NORTH, emailLabel, m, SpringLayout.SOUTH, dateOfBirthLabel);
+    layout.putConstraint(SpringLayout.EAST, emailLabel, 0, SpringLayout.EAST, firstNameLabel);
+
+    layout.putConstraint(SpringLayout.NORTH, emailField, 0, SpringLayout.NORTH, emailLabel);
+    layout.putConstraint(SpringLayout.SOUTH, emailField, 0, SpringLayout.SOUTH, emailLabel);
+    layout.putConstraint(SpringLayout.WEST, emailField, m, SpringLayout.EAST, emailLabel);
+
+    layout.putConstraint(SpringLayout.NORTH, address1Label, m, SpringLayout.SOUTH, emailLabel);
     //layout.putConstraint(SpringLayout.WEST, address1Label, 0, SpringLayout.WEST, lastNameLabel);
   }
 }
