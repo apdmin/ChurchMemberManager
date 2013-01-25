@@ -6,7 +6,9 @@
 
 package com.adarwin.pcbc;
 
-public class ConnectionInfo
+import java.io.Serializable;
+
+public class ConnectionInfo implements Serializable
 {
   private String databaseName;
   private String username;

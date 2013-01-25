@@ -16,6 +16,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.FlowLayout;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import javax.swing.border.EtchedBorder;
 import javax.swing.DefaultListModel;
@@ -95,12 +100,98 @@ public class ChurchMemberManager
       {
         //Starting the application inside this runnable object ensures that we are
         //running from the event queue. :-)
-        showStartScreen();
+        //showStartScreen();
+        startApplication();
       }
     });
   }
 
 
+
+
+
+
+  private static void startApplication()
+  {
+    if (connectionInfo == null)
+    {
+      // Try to deserialize it
+      deserializeConnectionInfo();
+    }
+    if (connectionInfo == null)
+    {
+      // If it's still null, provide a way to initialize it
+      showStartScreen();
+    }
+    else
+    {
+      createAndShowGUI();
+    }
+  }
+  
+
+
+
+  private static void serializeConnectionInfo()
+  {
+    FileOutputStream fileOut = null;
+    ObjectOutputStream objectOut = null;
+    try
+    {
+      fileOut = new FileOutputStream("ConnectionInfo.ci");
+      objectOut = new ObjectOutputStream(fileOut);
+      objectOut.writeObject(connectionInfo);
+    }
+    catch (IOException ex)
+    {
+      logbook.log(ex);
+    }
+    finally
+    {
+      try
+      {
+        if (objectOut != null) objectOut.close();
+        if (fileOut != null) fileOut.close();
+      }
+      catch (IOException ex)
+      {
+        logbook.log(ex);
+        logbook.log(Logbook.ERROR, "Unable to close output streams for some weird reason.");
+      }
+    }
+  }
+  private static void deserializeConnectionInfo()
+  {
+    FileInputStream fileIn = null;
+    ObjectInputStream objectIn = null;
+    try
+    {
+      fileIn = new FileInputStream("ConnectionInfo.ci");
+      objectIn = new ObjectInputStream(fileIn);
+      connectionInfo = (ConnectionInfo) objectIn.readObject();
+    }
+    catch (IOException ex)
+    {
+      logbook.log(ex);
+    }
+    catch (ClassNotFoundException ex)
+    {
+      logbook.log(ex);
+    }
+    finally
+    {
+      try
+      {
+        if (objectIn != null) objectIn.close();
+        if (fileIn != null) fileIn.close();
+      }
+      catch (IOException ex)
+      {
+        logbook.log(ex);
+        logbook.log(Logbook.ERROR, "Unable to close input streams for some weird reason.");
+      }
+    }
+  }
 
 
 
@@ -118,11 +209,11 @@ public class ChurchMemberManager
     userLabel.setHorizontalAlignment(SwingConstants.RIGHT);
     passwordLabel.setHorizontalAlignment(SwingConstants.RIGHT);
     final JTextField dbNameField = new JTextField("PantonChurch");
-    final JTextField userField = new JTextField("andrew");
+    final JTextField userField = new JTextField("root");
     final JPasswordField passwordField = new JPasswordField();
     JButton connectButton = new JButton("Connect");
     JButton cancelButton = new JButton("Cancel");
-    JCheckBox alwaysCheckBox = new JCheckBox("Always use these login credentials");
+    final JCheckBox alwaysCheckBox = new JCheckBox("Always use these login credentials");
 
     //Define any listeners the start screen components need
     connectButton.addActionListener(new ActionListener()
@@ -134,6 +225,10 @@ public class ChurchMemberManager
         connectionInfo.setUsername(userField.getText());
         connectionInfo.setPassword(new String(passwordField.getPassword()));
         startFrame.dispose();
+        if (alwaysCheckBox.isSelected())
+        {
+          serializeConnectionInfo();
+        }
         createAndShowGUI();
       }
     });

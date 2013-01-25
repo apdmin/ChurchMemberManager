@@ -29,6 +29,17 @@ public class Card extends JPanel
     configureLayout();
     assembleCard();
   }
+  protected String getSafeCardString(String inputString)
+  {
+    if (inputString == null || inputString.equalsIgnoreCase("null"))
+    {
+      return "";
+    }
+    else
+    {
+      return inputString;
+    }
+  }
   protected void setupCardComponents()
   {
     address1Label = new JLabel("Address Line 1:");
@@ -65,7 +76,8 @@ public class Card extends JPanel
     layout.putConstraint(SpringLayout.NORTH, imagePanel, 20, SpringLayout.NORTH, this);
     layout.putConstraint(SpringLayout.WEST, imagePanel, 20, SpringLayout.WEST, this);
 
-    layout.putConstraint(SpringLayout.WEST, address1Label, 20, SpringLayout.EAST, imagePanel);
+    layout.putConstraint(SpringLayout.NORTH, address1Label, 20, SpringLayout.SOUTH, imagePanel);
+    layout.putConstraint(SpringLayout.WEST, address1Label, 0, SpringLayout.WEST, imagePanel);
 
     layout.putConstraint(SpringLayout.NORTH, address2Label, 5, SpringLayout.SOUTH, address1Label);
     layout.putConstraint(SpringLayout.EAST, address2Label, 0, SpringLayout.EAST, address1Label);

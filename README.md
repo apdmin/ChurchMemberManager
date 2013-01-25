@@ -28,3 +28,11 @@ To run the application, you can simply double click on the "ChurchMemberManager.
 prefer to run it from the command line, you can navigate to the location of the jar file and then
 type.
 	java -jar ChurchMemberManager.jar
+
+
+Troubleshooting
+---------------
+*"I accidentally entered the wrong information at the start screen and now I can't fix it."*
+  Solution: Delete 'ConnectionInfo.ci' from the application directory. This will force the
+            application to prompt you with the start screen again.
+

@@ -170,13 +170,17 @@ public class MySQLAccess
   {
     if (inputValue == null || inputValue.equalsIgnoreCase("null"))
     {
-      return "NULL";
+      return null;
     }
     else
     {
       return inputValue;
     }
   }
+
+
+
+
   public void updateMember(Member member)
   {
     try
