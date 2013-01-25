@@ -55,10 +55,10 @@ public class ChurchMemberManager
   private static SpringLayout headerLayout, mainContentLayout;
   private static JPanel header, memberBrowsePanel, familyBrowsePanel;
   private static JTabbedPane mainTabbedPane;
-  private static JScrollPane memberListScrollPane, familyListScrollPane;
-  private static JSplitPane memberSplitPane, familySplitPane;
-  private static JList<String> memberJList, familyJList;
-  private static DefaultListModel<String> memberListModel, familyListModel;
+  private static JScrollPane memberListScrollPane, familyListScrollPane, searchListScrollPane;
+  private static JSplitPane memberSplitPane, familySplitPane, searchSplitPane;
+  private static JList<String> memberJList, familyJList, searchResultsJList;
+  private static DefaultListModel<String> memberListModel, familyListModel, searchListModel;
   private static JMenuBar menuBar;
   private static JMenu fileMenu, editMenu, databaseMenu, toolsMenu, helpMenu;
   private static JMenuItem openMenuItem, saveMenuItem, exitMenuItem;
@@ -355,11 +355,15 @@ public class ChurchMemberManager
 
     memberSplitPane = new JSplitPane();
     familySplitPane = new JSplitPane();
+    searchSplitPane = new JSplitPane();
 
     memberListScrollPane = new JScrollPane(memberJList);
     familyListScrollPane = new JScrollPane(familyJList);
+    searchListScrollPane = new JScrollPane(searchResultsJList);
+    /*
     memberListScrollPane.setPreferredSize(new Dimension(200, startingHeight));
     familyListScrollPane.setPreferredSize(new Dimension(200, startingHeight));
+    */
 
   }
 
@@ -381,6 +385,7 @@ public class ChurchMemberManager
 
     memberJList = new JList<String>(memberListModel);
     familyJList = new JList<String>(familyListModel);
+    searchResultsJList = new JList<String>(searchListModel);
 
     memberCard = new MemberCard();
     familyCard = new FamilyCard();
@@ -398,6 +403,7 @@ public class ChurchMemberManager
   {
     memberListModel = new DefaultListModel<String>();
     familyListModel = new DefaultListModel<String>();
+    searchListModel = new DefaultListModel<String>();
   }
 
 
@@ -490,9 +496,11 @@ public class ChurchMemberManager
     memberSplitPane.setRightComponent(memberCard);
     familySplitPane.setLeftComponent(familyListScrollPane);
     familySplitPane.setRightComponent(familyCard);
+    searchSplitPane.setLeftComponent(searchListScrollPane);
 
     mainTabbedPane.addTab("Members", memberSplitPane);
     mainTabbedPane.addTab("Families", familySplitPane);
+    mainTabbedPane.addTab("Search Results", searchSplitPane);
 
     contentPane.add(header, BorderLayout.NORTH);
     contentPane.add(mainTabbedPane, BorderLayout.CENTER);
