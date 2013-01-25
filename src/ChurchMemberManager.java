@@ -32,6 +32,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
@@ -43,89 +44,70 @@ import javax.swing.SwingUtilities;
 
 public class ChurchMemberManager
 {
+  protected static Logbook logbook;
   private static JFrame mainFrame;
   private static JTextField searchBox;
   private static SpringLayout headerLayout, mainContentLayout;
   private static JPanel header, memberBrowsePanel, familyBrowsePanel;
   private static JTabbedPane mainTabbedPane;
   private static JScrollPane memberListScrollPane, familyListScrollPane;
+  private static JSplitPane memberSplitPane, familySplitPane;
   private static JList<String> memberJList, familyJList;
   private static DefaultListModel<String> memberListModel, familyListModel;
   private static JMenuBar menuBar;
   private static JMenu fileMenu, editMenu, databaseMenu, toolsMenu, helpMenu;
   private static JMenuItem openMenuItem, saveMenuItem, exitMenuItem;
   private static JMenuItem optionsMenuItem;
+  private static MemberCard memberCard;
+  private static FamilyCard familyCard;
 
   private static MySQLAccess dbAccess;
-  private static String dbName, username, password;
+
+  private static ConnectionInfo connectionInfo;
 
   private static final int startingWidth = 800;
   private static final int startingHeight = 600;
   private static final String applicationName = "Church Member Manager";
 
-  private static void createAndShowGUI()
+
+
+
+
+
+  public static void main(String[] args)
   {
-    initializePeripherals();
-    initializeLayouts();
-    initializeComponents();
-    initializeContainers();
-    defineListeners();
-    configureLayouts();
-    assembleGUI();
-    loadDatabase();
+    logbook = new Logbook("ChurchMemberManager.log");
+    //Set the look and feel for this application.
+    try
+    {
+      UIManager.setLookAndFeel("com.jtattoo.plaf.acryl.AcrylLookAndFeel");
+    }
+    //If we encounter an exception, the jvm should default to the native look and feel,
+    //which is just fine.
+    catch (UnsupportedLookAndFeelException ex) { logbook.log(ex); }
+    catch (ClassNotFoundException ex) { logbook.log(ex); }
+    catch (InstantiationException ex) { logbook.log(ex); }
+    catch (IllegalAccessException ex) { logbook.log(ex); }
+
+    SwingUtilities.invokeLater(new Runnable()
+    {
+      public void run()
+      {
+        //Starting the application inside this runnable object ensures that we are
+        //running from the event queue. :-)
+        showStartScreen();
+      }
+    });
   }
 
-  private static void initializeLayouts()
-  {
-    headerLayout = new SpringLayout();
-  }
 
-  private static void initializeContainers()
-  {
-    mainFrame = new JFrame(applicationName);
-    mainFrame.setSize(new Dimension(startingWidth, startingHeight));
-    mainFrame.setLocationRelativeTo(null);
-    mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    mainFrame.setLayout(new BorderLayout());
 
-    header = new JPanel();
-    header.setLayout(headerLayout);
-    header.setPreferredSize(new Dimension(startingWidth, startingHeight/15));
 
-    memberBrowsePanel = new JPanel();
-    memberBrowsePanel.setLayout(new BorderLayout());
 
-    familyBrowsePanel = new JPanel();
-    familyBrowsePanel.setLayout(new BorderLayout());
-
-    mainTabbedPane = new JTabbedPane();
-
-    memberListScrollPane = new JScrollPane(memberJList);
-    familyListScrollPane = new JScrollPane(familyJList);
-    memberListScrollPane.setPreferredSize(new Dimension(200, startingHeight));
-    familyListScrollPane.setPreferredSize(new Dimension(200, startingHeight));
-
-  }
-
-  private static void initializeComponents()
-  {
-    menuBar = new JMenuBar();
-    fileMenu = new JMenu("File");
-    toolsMenu = new JMenu("Tools");
-    exitMenuItem = new JMenuItem("Exit");
-    optionsMenuItem = new JMenuItem("Options");
-
-    searchBox = new JTextField("Search");
-    searchBox.setForeground(Color.gray);
-    searchBox.setPreferredSize(new Dimension(150, 20));
-
-    memberJList = new JList<String>(memberListModel);
-
-    familyJList = new JList<String>(familyListModel);
-  }
 
   private static void showStartScreen()
   {
+    //Initialize containers and components for the start screen
     final JFrame startFrame = new JFrame("Welcome");
     startFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     startFrame.setMinimumSize(new Dimension(370, 160));
@@ -136,37 +118,38 @@ public class ChurchMemberManager
     userLabel.setHorizontalAlignment(SwingConstants.RIGHT);
     passwordLabel.setHorizontalAlignment(SwingConstants.RIGHT);
     final JTextField dbNameField = new JTextField("PantonChurch");
-    //dbNameField.setPreferredSize(new Dimension(100, 30));
     final JTextField userField = new JTextField("andrew");
-    //userField.setPreferredSize(new Dimension(100, 30));
     final JPasswordField passwordField = new JPasswordField();
-    //passwordField.setPreferredSize(new Dimension(100, 30));
     JButton connectButton = new JButton("Connect");
     JButton cancelButton = new JButton("Cancel");
     JCheckBox alwaysCheckBox = new JCheckBox("Always use these login credentials");
 
+    //Define any listeners the start screen components need
     connectButton.addActionListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent e)
       {
-        dbName = dbNameField.getText();
-        username = userField.getText();
-        password = new String(passwordField.getPassword());
+        connectionInfo = new ConnectionInfo();
+        connectionInfo.setDatabaseName(dbNameField.getText());
+        connectionInfo.setUsername(userField.getText());
+        connectionInfo.setPassword(new String(passwordField.getPassword()));
         startFrame.dispose();
         createAndShowGUI();
       }
     });
+
     cancelButton.addActionListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent e)
       {
-        //startFrame.dispose();
         System.exit(0);
       }
     });
 
+    //Configure the layout for the start screen
+    //Note that contentPane is used here to help define the layout and then is used later
+    //as the container for all components in this window.
     Container contentPane = startFrame.getContentPane();
-
     int m = 5; //m = margin
     SpringLayout layout = new SpringLayout();
     layout.putConstraint(SpringLayout.NORTH, dbNameLabel, 2*m, SpringLayout.NORTH, contentPane);
@@ -204,6 +187,7 @@ public class ChurchMemberManager
     layout.putConstraint(SpringLayout.SOUTH, alwaysCheckBox, -1*m, SpringLayout.SOUTH, contentPane);
     layout.putConstraint(SpringLayout.WEST, alwaysCheckBox, m, SpringLayout.WEST, contentPane);
 
+    //Add the components to the content pane
     contentPane.setLayout(layout);
     contentPane.add(dbNameLabel);
     contentPane.add(dbNameField);
@@ -215,16 +199,116 @@ public class ChurchMemberManager
     contentPane.add(cancelButton);
     contentPane.add(alwaysCheckBox);
 
+    //Position the startwindow in the center of the screen and make it visible
     startFrame.setLocationRelativeTo(null);
     startFrame.setVisible(true);
-    startFrame.pack();
   }
+
+
+
+
+
+
+
+
+  private static void createAndShowGUI()
+  {
+    initializePeripherals();
+    initializeLayouts();
+    initializeComponents();
+    initializeContainers();
+    defineListeners();
+    configureLayouts();
+    assembleGUI();
+    loadDatabase();
+  }
+
+
+
+
+
+
+
+  private static void initializeLayouts()
+  {
+    headerLayout = new SpringLayout();
+  }
+
+
+
+
+
+  private static void initializeContainers()
+  {
+    mainFrame = new JFrame(applicationName);
+    mainFrame.setSize(new Dimension(startingWidth, startingHeight));
+    mainFrame.setLocationRelativeTo(null);
+    mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    mainFrame.setLayout(new BorderLayout());
+
+    header = new JPanel();
+    header.setLayout(headerLayout);
+    header.setPreferredSize(new Dimension(startingWidth, 25));
+
+    //memberBrowsePanel = new JPanel();
+    //memberBrowsePanel.setLayout(new BorderLayout());
+
+    //familyBrowsePanel = new JPanel();
+    //familyBrowsePanel.setLayout(new BorderLayout());
+
+    mainTabbedPane = new JTabbedPane();
+
+    memberSplitPane = new JSplitPane();
+    familySplitPane = new JSplitPane();
+
+    memberListScrollPane = new JScrollPane(memberJList);
+    familyListScrollPane = new JScrollPane(familyJList);
+    memberListScrollPane.setPreferredSize(new Dimension(200, startingHeight));
+    familyListScrollPane.setPreferredSize(new Dimension(200, startingHeight));
+
+  }
+
+
+
+
+
+  private static void initializeComponents()
+  {
+    menuBar = new JMenuBar();
+    fileMenu = new JMenu("File");
+    toolsMenu = new JMenu("Tools");
+    exitMenuItem = new JMenuItem("Exit");
+    optionsMenuItem = new JMenuItem("Options");
+
+    searchBox = new JTextField("Search");
+    searchBox.setForeground(Color.gray);
+    searchBox.setPreferredSize(new Dimension(150, 20));
+
+    memberJList = new JList<String>(memberListModel);
+    familyJList = new JList<String>(familyListModel);
+
+    memberCard = new MemberCard();
+    familyCard = new FamilyCard();
+  }
+
+
+
+
+
+
+
+
 
   private static void initializePeripherals()
   {
     memberListModel = new DefaultListModel<String>();
     familyListModel = new DefaultListModel<String>();
   }
+
+
+
+
+
 
   private static void defineListeners()
   {
@@ -236,6 +320,7 @@ public class ChurchMemberManager
         System.exit(0);
       }
     });
+
     searchBox.addFocusListener(new FocusListener()
     {
       public void focusGained(FocusEvent e)
@@ -249,25 +334,44 @@ public class ChurchMemberManager
         searchBox.setForeground(Color.gray);
       }
     });
+
     memberJList.addListSelectionListener(new ListSelectionListener()
     {
       public void valueChanged(ListSelectionEvent e)
       {
-        String selection = memberJList.getSelectedValue();
-        String key = ", ";
-        String firstName = selection.substring(0, selection.indexOf(key));
-        String lastName = selection.substring(selection.indexOf(key) + key.length());
-        Member selectedMember = dbAccess.getMember(lastName, firstName);
+        if (!e.getValueIsAdjusting())
+        {
+          String selection = memberJList.getSelectedValue();
+          String key = ", ";
+          String lastName = selection.substring(0, selection.indexOf(key));
+          String firstName = selection.substring(selection.indexOf(key) + key.length());
+          Member selectedMember = dbAccess.getMember(lastName, firstName);
+          memberCard.setMember(selectedMember);
+          System.out.println(selectedMember);
+        }
       }
     });
   }
+
+
+
+
+
 
   private static void configureLayouts()
   {
     int m = 5; //m = margin
     headerLayout.putConstraint(SpringLayout.NORTH, searchBox,  m, SpringLayout.NORTH, header);
     headerLayout.putConstraint(SpringLayout.EAST, searchBox,  -1*m, SpringLayout.EAST, header);
+
+    //memberCard.configureLayout();
+    //familyCard.configureLayout();
   }
+
+
+
+
+
 
   private static void assembleGUI()
   {
@@ -282,32 +386,40 @@ public class ChurchMemberManager
 
     header.add(searchBox);
 
-    memberBrowsePanel.add(memberListScrollPane, BorderLayout.WEST);
-    familyBrowsePanel.add(familyListScrollPane, BorderLayout.WEST);
+    //memberBrowsePanel.add(memberListScrollPane, BorderLayout.WEST);
+    //familyBrowsePanel.add(familyListScrollPane, BorderLayout.WEST);
+    //memberCard.assembleCard();
+    //familyCard.assembleCard();
 
-    mainTabbedPane.addTab("Members", memberBrowsePanel);
-    mainTabbedPane.addTab("Families", familyBrowsePanel);
+    memberSplitPane.setLeftComponent(memberListScrollPane);
+    memberSplitPane.setRightComponent(memberCard);
+    familySplitPane.setLeftComponent(familyListScrollPane);
+    familySplitPane.setRightComponent(familyCard);
+
+    mainTabbedPane.addTab("Members", memberSplitPane);
+    mainTabbedPane.addTab("Families", familySplitPane);
 
     contentPane.add(header, BorderLayout.NORTH);
     contentPane.add(mainTabbedPane, BorderLayout.CENTER);
     mainFrame.setVisible(true);
   }
 
+
+
+
+
+
   private static void loadDatabase()
   {
-    dbAccess = new MySQLAccess(dbName, username, password);
+    dbAccess = new MySQLAccess(connectionInfo.getDatabaseName(),
+                               connectionInfo.getUsername(),
+                               connectionInfo.getPassword());
     dbAccess.loadDatabase();
     ArrayList<String> members = dbAccess.getMembersList();
     for (String member : members)
     {
       memberListModel.addElement(member);
     }
-    /*
-    String lastFirst = members.get(5);
-    dbAccess.getMember(lastFirst.substring(0, lastFirst.indexOf(",")),
-                       lastFirst.substring(lastFirst.indexOf(", ") + 2));
-    */
-
     ArrayList<String> families = dbAccess.getFamiliesList();
     for (String family : families)
     {
@@ -315,35 +427,9 @@ public class ChurchMemberManager
       familyListModel.addElement(family);
     }
   }
-  public static void main(String[] args)
-  {
-    try
-    {
-      UIManager.setLookAndFeel("com.jtattoo.plaf.acryl.AcrylLookAndFeel");
-    }
-    catch (UnsupportedLookAndFeelException ex)
-    {
-    }
-    catch (ClassNotFoundException ex)
-    {
-    }
-    catch (InstantiationException ex)
-    {
-    }
-    catch (IllegalAccessException ex)
-    {
-    }
-    SwingUtilities.invokeLater(new Runnable()
-    {
-      public void run()
-      {
-        showStartScreen();
-        //createAndShowGUI();
-      }
-    });
-    /*
-    MySQLAccess dbAccess = new MySQLAccess();
-    dbAccess.loadDatabase();
-    */
-  }
+
+
+
+
+
 }

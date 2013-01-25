@@ -127,17 +127,28 @@ public class MySQLAccess
 
   public Member getMember(String lastName, String firstName)
   {
+    Member member = new Member();
     try
     {
       if (properlySetup)
       {
-        resultSet = statement.executeQuery("select memID " +
-                                           "from members " +
+        resultSet = statement.executeQuery("select * " +
+                                           "from members natural join familymembers natural join families " +
                                            "where memFirstName like '" + firstName + "' " +
                                            "and memLastName like '" + lastName + "';");
         if (resultSet.next())
         {
-          System.out.println(resultSet.getString("memID"));
+          member.setID(resultSet.getInt("MemID"));
+          member.setFirstName(resultSet.getString("MemFirstName"));
+          member.setMiddleName(resultSet.getString("MemMIName"));
+          member.setLastName(resultSet.getString("MemLastName"));
+          member.setCellPhone(resultSet.getString("CellPhone"));
+          member.setEmail(resultSet.getString("Email"));
+          member.setBlurb(resultSet.getString("MemBlurb"));
+          member.setCurrent(resultSet.getString("MemCurrent").equals("Yes") ? true : false);
+          member.setDateOfBirth(resultSet.getDate("MemDOB"));
+          member.setAddressLine1(resultSet.getString("FAddrLine1"));
+          member.setAddressLine2(resultSet.getString("FAddrLine2"));
         }
       }
       else
@@ -149,7 +160,7 @@ public class MySQLAccess
     {
       logbook.log(ex);
     }
-    return null;
+    return member;
   }
 
 
