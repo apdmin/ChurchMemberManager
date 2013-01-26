@@ -1,6 +1,9 @@
 ChurchMemberManager
 ===================
 
+Author: Andrew P. Darwin
+apdmin@gmail.com
+
 Introduction
 ------------
 
