@@ -33,11 +33,6 @@ type.
 	java -jar ChurchMemberManager.jar
 
 
-Some New Section I'll Delete Later
-----------------------------------
-Random Section
-
-
 Troubleshooting
 ---------------
 *"I accidentally entered the wrong information at the start screen and now I can't fix it."*
